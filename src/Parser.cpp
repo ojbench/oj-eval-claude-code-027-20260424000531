@@ -33,6 +33,7 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         }
         case TokenType::PRINT: {
             std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components;
+            bool trailingComma = false;
             while (peek().type != TokenType::EOL) {
                 if (peek().type == TokenType::UNKNOWN && peek().text != "<>" && peek().text != "<=" && peek().text != ">=") {
                     components.push_back(next().text);
@@ -40,10 +41,10 @@ std::unique_ptr<Statement> Parser::parseStatement() {
                     components.push_back(parseExpression());
                 }
                 if (match(TokenType::COMMA)) {
-                    // Handled by next iteration
+                    if (peek().type == TokenType::EOL) trailingComma = true;
                 }
             }
-            return std::make_unique<PrintStatement>(std::move(components));
+            return std::make_unique<PrintStatement>(std::move(components), trailingComma);
         }
         case TokenType::INPUT: {
             Token var = next();

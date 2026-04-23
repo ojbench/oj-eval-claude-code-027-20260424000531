@@ -25,21 +25,20 @@ public:
 
 class PrintStatement : public Statement {
     std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components_;
+    bool trailingComma_;
 public:
-    PrintStatement(std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components)
-        : components_(std::move(components)) {}
+    PrintStatement(std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components, bool trailingComma)
+        : components_(std::move(components)), trailingComma_(trailingComma) {}
     void execute(VarState& state, Program& program) const override {
-        bool first = true;
         for (const auto& comp : components_) {
-            if (!first) std::cout << " ";
             if (std::holds_alternative<std::string>(comp)) {
                 std::cout << std::get<std::string>(comp);
             } else {
                 std::cout << std::get<std::unique_ptr<Expression>>(comp)->evaluate(state);
             }
-            first = false;
         }
-        std::cout << std::endl;
+        if (!trailingComma_) std::cout << std::endl;
+        else std::cout << std::flush;
     }
     std::string toString() const override { return "PRINT ..."; }
 };
