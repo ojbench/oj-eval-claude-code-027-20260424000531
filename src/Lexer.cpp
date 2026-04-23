@@ -29,7 +29,7 @@ Token Lexer::nextToken() {
             if (pos_ < input_.size()) {
                 if (input_[pos_] == '>') {
                     pos_++;
-                    return {TokenType::UNKNOWN, "<>"}; // Handled by parser for now, or add NEQ
+                    return {TokenType::UNKNOWN, "<>"};
                 }
                 if (input_[pos_] == '=') {
                     pos_++;
@@ -46,6 +46,15 @@ Token Lexer::nextToken() {
         case '(': return {TokenType::LPAREN, "("};
         case ')': return {TokenType::RPAREN, ")"};
         case ',': return {TokenType::COMMA, ","};
+        case '"': {
+            size_t start = pos_;
+            while (pos_ < input_.size() && input_[pos_] != '"') {
+                pos_++;
+            }
+            std::string text = input_.substr(start, pos_ - start);
+            if (pos_ < input_.size()) pos_++; // skip closing quote
+            return {TokenType::UNKNOWN, text}; // Using UNKNOWN for string content for now
+        }
         default: return {TokenType::UNKNOWN, std::string(1, c)};
     }
 }

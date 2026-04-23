@@ -32,7 +32,18 @@ std::unique_ptr<Statement> Parser::parseStatement() {
             return std::make_unique<LetStatement>(var.text, parseExpression());
         }
         case TokenType::PRINT: {
-            return std::make_unique<PrintStatement>(parseExpression());
+            std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components;
+            while (peek().type != TokenType::EOL) {
+                if (peek().type == TokenType::UNKNOWN && peek().text != "<>" && peek().text != "<=" && peek().text != ">=") {
+                    components.push_back(next().text);
+                } else {
+                    components.push_back(parseExpression());
+                }
+                if (match(TokenType::COMMA)) {
+                    // Handled by next iteration
+                }
+            }
+            return std::make_unique<PrintStatement>(std::move(components));
         }
         case TokenType::INPUT: {
             Token var = next();

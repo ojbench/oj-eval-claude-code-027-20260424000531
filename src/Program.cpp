@@ -34,12 +34,9 @@ void Program::run(VarState& state) {
         try {
             it->second->execute(state, *this);
             // If pc_ was not changed by execute (like GOTO), and was -1, then stop
-            if (pc_ == currentPC) {
-                // This shouldn't happen if we updated pc_ to nextIt->first
-            }
             if (pc_ == -1) running_ = false;
         } catch (const std::exception& e) {
-            std::cout << "Error: " << e.what() << std::endl;
+            std::cout << e.what() << std::endl;
             running_ = false;
         }
     }

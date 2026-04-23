@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+#include <variant>
 #include "Expression.hpp"
 #include "Program.hpp"
 
@@ -21,11 +24,19 @@ public:
 };
 
 class PrintStatement : public Statement {
-    std::unique_ptr<Expression> expr_;
+    std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components_;
 public:
-    PrintStatement(std::unique_ptr<Expression> expr) : expr_(std::move(expr)) {}
+    PrintStatement(std::vector<std::variant<std::unique_ptr<Expression>, std::string>> components)
+        : components_(std::move(components)) {}
     void execute(VarState& state, Program& program) const override {
-        std::cout << expr_->evaluate(state) << std::endl;
+        for (const auto& comp : components_) {
+            if (std::holds_alternative<std::string>(comp)) {
+                std::cout << std::get<std::string>(comp);
+            } else {
+                std::cout << std::get<std::unique_ptr<Expression>>(comp)->evaluate(state);
+            }
+        }
+        std::cout << std::endl;
     }
     std::string toString() const override { return "PRINT ..."; }
 };
@@ -36,8 +47,7 @@ public:
     InputStatement(std::string var) : var_(var) {}
     void execute(VarState& state, Program& program) const override {
         int val;
-        // std::cout << "? "; // Remove prompt
-        if (!(std::cin >> val)) return; // Silently fail or throw
+        if (!(std::cin >> val)) return;
         state.set(var_, val);
     }
     std::string toString() const override { return "INPUT " + var_; }

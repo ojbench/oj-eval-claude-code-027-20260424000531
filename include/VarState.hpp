@@ -36,7 +36,7 @@ public:
                 return sit->second;
             }
         }
-        throw std::runtime_error("VARIABLE NOT DEFINED: " + name);
+        throw std::runtime_error("VARIABLE NOT DEFINED");
     }
 
     void clear() {
