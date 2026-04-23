@@ -30,6 +30,8 @@ int main() {
                 } else {
                     program.removeStatement(lineNum);
                 }
+            } else if (tokens[0].type == TokenType::REM) {
+                // Ignore immediate REM
             } else {
                 // Immediate command
                 if (tokens[0].type == TokenType::RUN) {

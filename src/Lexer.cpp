@@ -25,8 +25,24 @@ Token Lexer::nextToken() {
         case '*': return {TokenType::STAR, "*"};
         case '/': return {TokenType::SLASH, "/"};
         case '=': return {TokenType::EQUAL, "="};
-        case '<': return {TokenType::LESS, "<"};
-        case '>': return {TokenType::GREATER, ">"};
+        case '<':
+            if (pos_ < input_.size()) {
+                if (input_[pos_] == '>') {
+                    pos_++;
+                    return {TokenType::UNKNOWN, "<>"}; // Handled by parser for now, or add NEQ
+                }
+                if (input_[pos_] == '=') {
+                    pos_++;
+                    return {TokenType::UNKNOWN, "<="};
+                }
+            }
+            return {TokenType::LESS, "<"};
+        case '>':
+            if (pos_ < input_.size() && input_[pos_] == '=') {
+                pos_++;
+                return {TokenType::UNKNOWN, ">="};
+            }
+            return {TokenType::GREATER, ">"};
         case '(': return {TokenType::LPAREN, "("};
         case ')': return {TokenType::RPAREN, ")"};
         case ',': return {TokenType::COMMA, ","};

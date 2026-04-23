@@ -36,8 +36,8 @@ public:
     InputStatement(std::string var) : var_(var) {}
     void execute(VarState& state, Program& program) const override {
         int val;
-        std::cout << "? ";
-        if (!(std::cin >> val)) throw std::runtime_error("INVALID INPUT");
+        // std::cout << "? "; // Remove prompt
+        if (!(std::cin >> val)) return; // Silently fail or throw
         state.set(var_, val);
     }
     std::string toString() const override { return "INPUT " + var_; }

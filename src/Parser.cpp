@@ -47,15 +47,14 @@ std::unique_ptr<Statement> Parser::parseStatement() {
         case TokenType::IF: {
             auto left = parseExpression();
             std::string op = "";
-            if (match(TokenType::EQUAL)) op = "=";
-            else if (match(TokenType::LESS)) {
-                if (match(TokenType::GREATER)) op = "<>";
-                else if (match(TokenType::EQUAL)) op = "<=";
-                else op = "<";
-            }
-            else if (match(TokenType::GREATER)) {
-                if (match(TokenType::EQUAL)) op = ">=";
-                else op = ">";
+            Token opToken = next();
+            if (opToken.type == TokenType::EQUAL) op = "=";
+            else if (opToken.type == TokenType::LESS) op = "<";
+            else if (opToken.type == TokenType::GREATER) op = ">";
+            else if (opToken.type == TokenType::UNKNOWN) {
+                if (opToken.text == "<>" || opToken.text == "<=" || opToken.text == ">=") {
+                    op = opToken.text;
+                }
             }
             if (op == "") throw std::runtime_error("EXPECTED COMPARISON OPERATOR");
             auto right = parseExpression();
