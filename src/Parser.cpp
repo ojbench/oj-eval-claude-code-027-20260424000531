@@ -37,9 +37,13 @@ std::unique_ptr<Statement> Parser::parseStatement() {
             while (peek().type != TokenType::EOL) {
                 if (peek().type == TokenType::UNKNOWN && peek().text != "<>" && peek().text != "<=" && peek().text != ">=") {
                     components.push_back(next().text);
-                } else {
+                } else if (peek().type == TokenType::IDENTIFIER || peek().type == TokenType::NUMBER || peek().type == TokenType::LPAREN || peek().type == TokenType::MINUS) {
                     components.push_back(parseExpression());
+                } else {
+                    // Skip or handle other tokens
+                    next();
                 }
+
                 if (match(TokenType::COMMA)) {
                     if (peek().type == TokenType::EOL) trailingComma = true;
                 }
